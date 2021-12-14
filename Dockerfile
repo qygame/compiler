@@ -23,7 +23,20 @@ RUN apt update && \
     cd unixODBC* && \
     ./configure --prefix=/third_sites/odbc --enable-static=no --enable-gui=no --enable-iconv=yes --with-iconv-char-enc=GB18030 && \
     make && make install && \
-    cd /
+    cd / && \
+    echo -e "=========> make hiredis" && \
+    git clone --branch v1.0.2 https://github.com/redis/hiredis.git && cd hiredis && \
+    make PREFIX=/third_sites/hiredis && \
+    make install PREFIX=/third_sites/hiredis && \
+    cd / && \
+    echo -e "=========> make redis-cpp-cpuu" && \
+    git clone --branch 1.3.2 https://github.com/sewenew/redis-plus-plus.git && \
+    cd redis-plus-plus && \
+    mkdir build && cd build && \
+    cmake -DCMAKE_PREFIX_PATH=/third_sites/hiredis -DCMAKE_INSTALL_PREFIX=/third_sites/redis-plus-plus -DREDIS_PLUS_PLUS_CXX_STANDARD=11 .. && \
+    make && make install && \
+    cd /    
+
 
 COPY docker.sh /docker.sh
 COPY for_rep_server_env.sh /for_rep_server_env.sh
