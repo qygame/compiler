@@ -25,12 +25,45 @@ export TERM=xterm
 
 
 # ****************** fun ******************
-fun_git_cfg()
-{
+fun_git_cfg(){
     git config --global user.email "3@q.com"
     git config --global user.name "wcq"
 }
 
+# make qybase9/net
+fun_make_qybase_net(){
+    echo ""
+    tput setaf 3
+    printf 'step%-2s fun_make_qybase9/net\n' $((step++))
+    tput sgr0
+
+    cd /
+    # 1. git clone qybase9/net
+    remote_url="https://$INPUT_QYGAME_TOKEN@github.com/qybase9/net.git"
+    git clone $remote_url net && cd net
+
+    # 2. make
+    make
+
+    # 3. mv net dire => /env_rep_sdir/net
+    if ! [ -d $env_rep_sdir ];then
+	echo "err: there is no env_rep_sdir"
+	exit 2
+    fi
+
+    if ! [ -d "_depends" ];then
+	echo "err: there is no net/_depends"
+	exit 2
+    fi
+
+    mv _depends $env_rep_sdir/net   
+
+    tput setaf 2
+    echo "make qybase9/net success"
+    tput sgr0
+}
+
+# docker-publish
 fun_deploy_to_publish_tag(){
     echo ""
     tput setaf 3
@@ -75,8 +108,7 @@ fun_deploy_to_publish_tag(){
 }
 
 # dc -- docker-compose
-fun_deploy_to_dc_branch_and_dc_tag()
-{
+fun_deploy_to_dc_branch_and_dc_tag(){
     echo ""
     tput setaf 3
     printf 'step%-2s fun_deploy_to_dc_branch_and_dc_tag\n' $((step++))
@@ -99,9 +131,8 @@ fun_deploy_to_dc_branch_and_dc_tag()
     fi
 }
 
-#
-fun_deploy_to_qyaction_branch_and_qyaction_tag()
-{
+# qyaction
+fun_deploy_to_qyaction_branch_and_qyaction_tag(){
     echo ""
     tput setaf 3
     printf 'step%-2s fun_deploy_to_dc_branch_and_dc_tag\n' $((step++))
@@ -142,9 +173,8 @@ fun_deploy_to_qyaction_branch_and_qyaction_tag()
     fi
 }
 
-#
-fun_deploy_to_k8s_branch_and_k8s_tag()
-{
+# k8s
+fun_deploy_to_k8s_branch_and_k8s_tag(){
     :
 }
 # ****************** main ******************
@@ -153,8 +183,10 @@ if [[ $INPUT_QYGAME_TOKEN == "" ]];then
     echo "No INPUT_QYGAME_TOKEN, exit 0"
     exit 0
 fi
-
+   
 fun_git_cfg
+# 在Dockerfile中没法传递QYGAME_TOKEN(TODO 也可能是我不知道怎么传递) 所以放到了docker中处理
+fun_make_qybase_net
 
 #
 fun_deploy_to_publish_tag
