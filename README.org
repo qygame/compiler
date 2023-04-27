@@ -1,32 +1,7 @@
+用来生成qygame代码的编译和运行环境qy_dev(docker镜像, 放在dockerhub中)
 
-* 分支的意义
-  - master
-    env环境的构造. env环境决定了tag
-    其他分支均都依赖env环境, 因此其他分支的tag, 均都由env的tag决定, 由workflow自动生成
-  - qyaction
-    为qy-code提供的github action
-    qy-code的tag与qyaction的tag必须x.y.z中的x相同
-  - docker-compose
-    使用docker-compose构造开发或发布环境
-    #+BEGIN_EXAMPLE 优缺点
-    优点:
-    - 简单 (待商榷)
-
-    缺点:
-    - 针对单一host
-    - 只是简化了docker run的操作, 缺少自动化监控手段
-    #+END_EXAMPLE
-  - k8s
-    使用k8s构造开发与发布环境
-    #+BEGIN_EXAMPLE 优缺点
-    优点:
-    - 自动化运营 balabala
-
-    缺点:
-    - 略显麻烦
-    #+END_EXAMPLE
-  
-* tag的生成
-  master的tag 手动指定,
-  之后会通过workflow生成其他分支对应的tag
-  比如 docker-compose_1.0.0
+待处理
+1. 后期可能会增加运行环境qy_deploy. qy_dev镜像自身太大了
+2. 这里未对qy_dev镜像使用tag, 统一使用了latest.
+   一是方便docker-compose, k8s, qyaction中对qy_dev镜像的调用
+   二是暂时还没有需要对qy_dev镜像做tag对场景需求
