@@ -5,10 +5,13 @@ COPY env.sh /env.sh
 
 RUN apt update && apt install curl git make g++ unzip cmake -y
 
-RUN echo "=========> download protoc" &&  cd / && \
-    wget https://github.com/protocolbuffers/protobuf/releases/download/v22.3/protoc-22.3-linux-x86_64.zip && \
-    unzip -d protoc protoc-* && rm protoc-*.zip && \
-    mkdir -p /third_sites && mv protoc /third_sites/protoc
+RUN echo -e "=========> make protobuf" &&  cd / && \
+    git clone --branch v22.3 https://github.com/protocolbuffers/protobuf.git protobuf && cd protobuf && \
+    git submodule update --init --recursive && \
+    cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/third_sites/protobuf -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_BUILD_SHARED_LIBS=ON && \
+    cmake --build build && \
+    cmake --build build --target install && \
+    rm -rf /protobuf
 
 RUN echo -e "=========> make glog" && cd / && \
     git clone --branch v0.5.0 https://github.com/google/glog.git && cd glog && \
