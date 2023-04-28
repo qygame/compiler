@@ -46,18 +46,13 @@ RUN echo "=========> install sql_driver for odbc" && cd / &&\
     ACCEPT_EULA=Y apt-get install -y msodbcsql17 && \
     apt-get install -y unixodbc-dev
 
-RUN echo "=========> make Asio" && cd / && \
-    wget https://udomain.dl.sourceforge.net/project/asio/asio/1.26.0%20%28Stable%29/asio-1.26.0.tar.gz && \
-    tar xf asio-*.tar.gz && rm asio-*.tar.gz && \
-    cd asio* && \
-    ./configure --prefix=/third_sites/asio && \
-    make && make install && \
-    rm -rf /asio*
-
 RUN --mount=type=secret,id=GIT_AUTH_TOKEN  \
     echo "=========> make qynet" && cd / && \
     token=`cat /run/secrets/GIT_AUTH_TOKEN` && \
-    git clone https://$token@github.com/learn2024/handy.git net && ls net
+    git clone https://$token@github.com/wxlib/handy.git handy && cd handy && \
+    make && \
+    mv _depends /third_sites/qynet && \
+    rm -rf /handy
 
 RUN echo "=========> ./env.sh" && cd / && \
     ./env.sh && rm /env.sh

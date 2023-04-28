@@ -36,7 +36,7 @@ fun_set_odbc_ini()
     echo "Server=tcp:172.16.238.10,1433"            >>  $(pwd)/odbc/etc/odbc.ini
 }
 #################### main ####################
-cd `dirname $0`
+cd /third_sites
 
 for file in `ls`
 do
