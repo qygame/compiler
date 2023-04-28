@@ -17,6 +17,10 @@ fun_set_bin()
     export PATH=$PATH:$1
 }
 
+fun_set_pkgcfg(){
+    export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$1
+}
+
 fun_set_odbc_env()
 {
     export ODBCSYSINI=$(pwd)/odbc/etc
@@ -51,6 +55,10 @@ do
     if [ -d "$file/bin" ];then
 	fun_set_bin $(pwd)/$file/bin
     fi
+
+    if [ -d "$file/lib/pkgconfig" ];then
+       fun_set_pkgcfg $(pwd)/$file/lib/pkgconfig
+    fi
 done
 
 # odbc
@@ -65,3 +73,4 @@ echo "export LIBRARY_PATH=$LIBRARY_PATH"             >> ~/.bashrc
 echo "export PATH=$PATH"                             >> ~/.bashrc
 echo "export ODBCSYSINI=$ODBCSYSINI"                 >> ~/.bashrc
 echo "export ODBCINI=$ODBCINI"                       >> ~/.bashrc
+echo "export PKG_CONFIG_PATH=$PKG_CONFIG_PATH"       >> ~/.bashrc

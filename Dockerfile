@@ -8,7 +8,7 @@ RUN apt update && apt install curl git make g++ unzip cmake -y
 RUN echo -e "=========> make protobuf" &&  cd / && \
     git clone --branch v22.3 https://github.com/protocolbuffers/protobuf.git protobuf && cd protobuf && \
     git submodule update --init --recursive && \
-    cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/third_sites/protobuf -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_BUILD_SHARED_LIBS=ON && \
+    cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/third_sites/protobuf -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_BUILD_SHARED_LIBS=ON -DCMAKE_CXX_STANDARD=20 && \
     cmake --build build && \
     cmake --build build --target install && \
     rm -rf /protobuf
