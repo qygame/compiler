@@ -1,7 +1,39 @@
-用来生成qygame代码的编译和运行环境qy_dev(docker镜像, 放在dockerhub中)
+*目标*
+构建docker image来管理qygame的运行环境. image托管在[[https://hub.docker.com/repository/docker/clay2019/qy_dev/general][dockerhub clay2019/qy_dev]]
 
-待处理
+
+*流程*
+1. push触发.github/workflow/main.yml
+2. main.yml中调用docker
+3. Dockerfile中控制了程序运行环境 (第三方库及其配置)
+   同时Dockerfile会启动env.sh, 配置docker image的环境配置
+4. main.yml把docker image push到dockerhub/clay2019/qy_dev
+
+   
+*待处理*
 1. 后期可能会增加运行环境qy_deploy. qy_dev镜像自身太大了
 2. 这里未对qy_dev镜像使用tag, 统一使用了latest.
    一是方便docker-compose, k8s, qyaction中对qy_dev镜像的调用
    二是暂时还没有需要对qy_dev镜像做tag对场景需求
+
+
+*已接入第三方*
+| 名字                 | 作用                    | 说明        |
+|----------------------+-------------------------+-------------|
+| protobuf             | 协议格式                |             |
+|----------------------+-------------------------+-------------|
+| glog                 | 日志                    |             |
+|----------------------+-------------------------+-------------|
+| odbc                 | 数据库驱动              |             |
+|----------------------+-------------------------+-------------|
+| mssql drive for odbc |                         |             |
+|----------------------+-------------------------+-------------|
+| hiredis              | redis api for c         |             |
+|----------------------+-------------------------+-------------|
+| redis-plus-plus      | redis api for c++       | 依赖hiredis |
+|----------------------+-------------------------+-------------|
+| qynet                | 网络库                  |             |
+|----------------------+-------------------------+-------------|
+| lsp server:clangd    | lsp server, IDE语法分析 |             |
+|----------------------+-------------------------+-------------|
+
