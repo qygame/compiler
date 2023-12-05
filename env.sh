@@ -72,8 +72,14 @@ fun_set_odbc_ini() {
 
 
 #################### main ####################
-## odbcinst.ini会在安装odbcsql的时候自动配置,只需要配置odbc.ini即可
+## odbcinst.ini会在安装odbcsql的时候自动配置. 当时放到了/etc目录下
+## odbcinst.ini在 /usr/local/etc下
+dir=/usr/local/etc
+mv /etc/odbcinst.ini $dir/
+
 # odbc.ini
-echo "[mssql]"                                  >   /etc/odbc.ini
-echo "Driver=ODBC Driver 18 for SQL Server"     >>  /etc/odbc.ini
-echo "Server=tcp:172.16.238.10,1433"            >>  /etc/odbc.ini
+echo "[mssql]"                                  >   $dir/odbc.ini
+echo "Driver=ODBC Driver 18 for SQL Server"     >>  $dir/odbc.ini
+echo "Server=tcp:172.16.238.10,1433"            >>  $dir/odbc.ini
+echo "Encrypt=no"                               >>  $dir/odbc.ini
+
