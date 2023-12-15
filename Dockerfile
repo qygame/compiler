@@ -1,8 +1,6 @@
 FROM gcc:13.2
 WORKDIR /
 
-COPY env.sh /home/env.sh
-
 RUN apt update && apt install curl git make g++ unzip cmake -y
 
 RUN echo -e "=========> make protobuf" &&  cd /home && \
@@ -13,6 +11,16 @@ RUN echo -e "=========> make protobuf" &&  cd /home && \
     cmake --build build && \
     cmake --build build --target install && \
     rm -rf /home/protobuf
+
+RUN echo -e "=========> make MySQL Connector/C++" && cd /home && \
+    git clone https://github.com/clay9/mysql-connector-cpp.git mysql && cd mysql && \
+    cmake -S . -B build -DWITH_PROTOBUF=system -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=ins_build && \
+    cmake --build build && \
+    cmake --build build --target install --config Release && \
+    mv ins_build/include/mysqlx /usr/local/include/ && \
+    mv ins_build/lib64/* /usr/local/lib && \
+    ldconfig && \
+    rm -rf /home/mysql
 
 RUN echo -e "=========> make glog" && cd /home && \
     git clone --branch v0.6.0 https://github.com/google/glog.git && cd glog && \
@@ -35,21 +43,6 @@ RUN echo -e "=========> make redis-cpp-cpuu" && cd /home && \
     make && make install && \
     rm -rf /home/redis-plus-plus
 
-RUN echo -e "=========> make odbc" && cd /home && \
-    wget ftp://ftp.unixodbc.org/pub/unixODBC/unixODBC-2.3.12.tar.gz && \
-    tar xf unixODBC*.tar.gz && rm unixODBC*.tar.gz && \
-    cd unixODBC* && \
-    ./configure --enable-static=no --enable-gui=no --enable-iconv=yes --with-iconv-char-enc=GB18030 && \
-    make && make install && \
-    rm -rf /home/unixODBC*
-
-RUN echo "=========> install sql_driver for odbc" && cd /home &&\
-    curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg && \
-    curl https://packages.microsoft.com/config/debian/12/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
-    apt-get update && \
-    ACCEPT_EULA=Y apt-get install -y msodbcsql18 && \
-    apt-get install -y unixodbc-dev
-
 RUN echo "=========> install asio" && cd /home &&\
     git clone --branch asio-1-28-2 https://github.com/chriskohlhoff/asio.git && \
     cd asio/asio && \
@@ -65,6 +58,3 @@ RUN echo "=========> install lsp-server: clangd" && cd /home &&\
     mv clangd*/bin/clangd /usr/local/bin/ && \
     mv clangd*/lib/clang /usr/local/lib/ && \
     rm -rf /home/clangd*
-
-RUN echo "=========> ./env.sh" && cd /home && \
-    ./env.sh && rm env.sh

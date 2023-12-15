@@ -78,8 +78,8 @@ dir=/usr/local/etc
 mv /etc/odbcinst.ini $dir/
 
 # odbc.ini
-echo "[mssql]"                                  >   $dir/odbc.ini
-echo "Driver=ODBC Driver 18 for SQL Server"     >>  $dir/odbc.ini
-echo "Server=tcp:172.16.238.10,1433"            >>  $dir/odbc.ini
-echo "Encrypt=no"                               >>  $dir/odbc.ini
+# echo "[mssql]"                                  >   $dir/odbc.ini
+# echo "Driver=ODBC Driver 18 for SQL Server"     >>  $dir/odbc.ini
+# echo "Server=tcp:172.16.238.10,1433"            >>  $dir/odbc.ini
+# echo "Encrypt=no"                               >>  $dir/odbc.ini
 
