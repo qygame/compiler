@@ -19,7 +19,6 @@ RUN echo -e "=========> make MySQL Connector/C++" && cd /home && \
     cmake --build build --target install --config Release && \
     mv ins_build/include/mysqlx /usr/local/include/ && \
     mv ins_build/lib64/* /usr/local/lib && \
-    ldconfig && \
     rm -rf /home/mysql
 
 RUN echo -e "=========> make glog" && cd /home && \
@@ -58,3 +57,5 @@ RUN echo "=========> install lsp-server: clangd" && cd /home &&\
     mv clangd*/bin/clangd /usr/local/bin/ && \
     mv clangd*/lib/clang /usr/local/lib/ && \
     rm -rf /home/clangd*
+
+RUN ldconfig
