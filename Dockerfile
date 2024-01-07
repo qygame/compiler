@@ -13,7 +13,7 @@ RUN echo -e "=========> make protobuf" &&  cd /home && \
     rm -rf /home/protobuf
 
 RUN echo -e "=========> make MySQL Connector/C++" && cd /home && \
-    git clone https://github.com/clay9/mysql-connector-cpp.git mysql && cd mysql && \
+    git clone https://github.com/qydocker/mysql-connector-cpp.git mysql && cd mysql && \
     cmake -S . -B build -DWITH_PROTOBUF=system -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=ins_build && \
     cmake --build build && \
     cmake --build build --target install --config Release && \
