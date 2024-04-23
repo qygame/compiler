@@ -1,30 +1,32 @@
 *目标*
-构建docker image来管理qygame的运行环境. image托管在[[https://hub.docker.com/repository/docker/clay2019/qy_dev/general][dockerhub clay2019/qy_dev]]
+build qygame compiler
+包含一个gcc, gdb 以及运行需要的dll(.so or .a)环境
+
+以docker image的形式交付. image托管在[[https://hub.docker.com/repository/docker/clay2019/qy_compiler/general][dockerhub clay2019/qy_compiler]]
 
 
-*流程*
-1. push tag触发 .github/workflow/main.yml
-2. main.yml中调用docker
-3. Dockerfile中控制了程序运行环境 (第三方库及其配置)
-   同时Dockerfile会启动env.sh, 配置docker image的环境配置
-4. main.yml把docker image push到dockerhub/clay2019/qy_dev
+*构造流程*
+1. trigger when push tag
+2. main.yml call docker (Dockerfile安装配置第三方库)
+4. main.yml push docker-image to dockerhub/clay2019/qy_compiler
 
    
 *待处理*
-1. 后期可能会增加运行环境qy_deploy. qy_dev镜像自身太大了
-2. 这里未对qy_dev镜像使用tag, 统一使用了latest.
-   一是方便docker-compose, k8s, qyaction中对qy_dev镜像的调用
-   二是暂时还没有需要对qy_dev镜像做tag对场景需求
+1. 这里未对qy_compiler使用tag, 统一使用了latest
+   一是方便docker-compose, k8s, qyaction中对qy_compiler镜像的调用
+   二是暂时还没有对qy_compiler添加tag的场景需求
 
 
 *已接入第三方*
 | 名字                | 作用                    | 说明        |
 |---------------------+-------------------------+-------------|
+| cmake               |                         |             |
+|---------------------+-------------------------+-------------|
 | protobuf            | 协议格式                |             |
 |---------------------+-------------------------+-------------|
-| glog                | 日志                    |             |
-|---------------------+-------------------------+-------------|
 | mysql Connector/C++ | 数据库驱动              |             |
+|---------------------+-------------------------+-------------|
+| glog                | 日志                    |             |
 |---------------------+-------------------------+-------------|
 | hiredis             | redis api for c         |             |
 |---------------------+-------------------------+-------------|
@@ -34,4 +36,3 @@
 |---------------------+-------------------------+-------------|
 | lsp server:clangd   | lsp server, IDE语法分析 |             |
 |---------------------+-------------------------+-------------|
-
