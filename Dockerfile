@@ -27,7 +27,7 @@ RUN echo -e "=========> make MySQL Connector/C++" && cd /home && \
     rm -rf /home/mysql
 
 RUN echo -e "=========> make glog" && cd /home && \
-    git clone --branch v0.7.0 https://github.com/google/glog.git && cd glog && \
+    git clone --branch v0.6.0 https://github.com/google/glog.git && cd glog && \
     cmake -S . -B build -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DWITH_GTEST=OFF -G "Unix Makefiles" -DCMAKE_RULE_MESSAGES=OFF -DCMAKE_INSTALL_MESSAGE=NEVER && \
     cmake --build build && \
     cmake --build build --target install && \
