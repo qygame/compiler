@@ -16,8 +16,8 @@ RUN echo -e "=========> make protobuf" &&  cd /home && \
     rm -rf /home/protobuf
 
 RUN echo -e "=========> make MySQL Connector/C++" && cd /home && \
-    git clone --branch 8.3.0 https://github.com/mysql/mysql-connector-cpp.git mysql && cd mysql && \
-    cmake -S . -B build -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=ins_build && \
+    git clone https://github.com/qygame/mysql-connector-cpp.git mysql && cd mysql && \
+    cmake -S . -B build -DWITH_PROTOBUF=system -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=ins_build && \
     cmake --build build && \
     cp INFO_SRC build && \
     cmake --build build --target install --config Release && \
