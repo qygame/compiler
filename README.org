@@ -1,6 +1,6 @@
 *目标*
 build qygame compiler
-包含一个gcc, gdb 以及运行需要的dll(.so or .a)环境
+包含一个gcc, gdb 以及运行需要的环境
 
 以docker image的形式交付. image托管在[[https://hub.docker.com/repository/docker/clay2019/qy_compiler/general][dockerhub clay2019/qy_compiler]]
 
@@ -10,7 +10,7 @@ build qygame compiler
 2. main.yml call docker (Dockerfile安装配置第三方库)
 4. main.yml push docker-image to dockerhub/clay2019/qy_compiler
 
-   
+
 *待处理*
 1. 这里未对qy_compiler使用tag, 统一使用了latest
    一是方便docker-compose, k8s, qyaction中对qy_compiler镜像的调用
