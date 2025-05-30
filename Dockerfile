@@ -18,13 +18,12 @@ RUN echo -e "=========> make protobuf" && cd /home && \
     rm -rf /home/protobuf
 
 RUN echo -e "=========> make MySQL Connector/C++" && cd /home && \
-    git clone --branch 9.3.0 https://github.com/mysql/mysql-connector-cpp.git mysql && cd mysql && \
-    cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=ins_build -DCMAKE_CXX_STANDARD=23 -DCMAKE_RULE_MESSAGES=OFF -DCMAKE_INSTALL_MESSAGE=NEVER && \
-    cmake --build build && \
-    cmake --build build --target install --config Release && \
-    mv ins_build/include/mysqlx /usr/local/include/ && \
-    mv ins_build/lib64/* /usr/local/lib && \
-    rm -rf /home/mysql
+    mkdir mysql-connector-cpp && cd mysql-connector-cpp && \
+    wget -q https://cdn.mysql.com//Downloads/Connector-C++/libmysqlcppconn10_9.3.0-1debian12_amd64.deb && \
+    wget -q https://cdn.mysql.com//Downloads/Connector-C++/libmysqlcppconnx2_9.3.0-1debian12_amd64.deb && \
+    wget -q https://cdn.mysql.com//Downloads/Connector-C++/libmysqlcppconn-dev_9.3.0-1debian12_amd64.deb && \
+    dpkg -i * && \
+    rm -rf /home/mysql-connector-cpp
 
 RUN echo -e "=========> make glog" && cd /home && \
     git clone --branch v0.7.1 https://github.com/google/glog.git && cd glog && \
