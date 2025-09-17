@@ -2,19 +2,13 @@
 build qygame server compiler
 包含gcc编译器 && 编译所需要的库
 
-以docker image的形式交付. image托管在[[https://hub.docker.com/repository/docker/clay2019/qy_compiler/general][dockerhub clay2019/qy_compiler]]
+以docker image的形式交付. image托管在ghcr.io/qygame/qy-compiler
 
 
 *构造流程*
 1. trigger when push tag
 2. main.yml call docker (Dockerfile安装配置第三方库)
-4. main.yml push docker-image to dockerhub/clay2019/qy_compiler
-
-
-*待处理*
-1. 这里未对clay2019/qy_compiler使用tag, 统一使用了latest
-   一是方便docker-compose, k8s, qyaction中对qy_compiler镜像的调用
-   二是暂时还没有对qy_compiler添加tag的场景需求
+4. main.yml push docker-image to ghcr.io/qygame/qy-compiler
 
 
 *已接入第三方*
