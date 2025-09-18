@@ -58,7 +58,7 @@ RUN git clone --branch 1.3.14 https://github.com/sewenew/redis-plus-plus.git /ho
 
 # ---- asio ----
 RUN git clone --branch asio-1-34-2 https://github.com/chriskohlhoff/asio.git /home/asio && cd /home/asio/asio && \
-    ./autogen.sh && ./configure && \
+    ./autogen.sh >/dev/null && ./configure >/dev/null && \
     make -s > /dev/null  && make install >/dev/null && \
     rm -rf /home/asio
 
