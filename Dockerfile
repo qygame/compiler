@@ -38,11 +38,11 @@ RUN case "$TARGETPLATFORM" in \
     mkdir -p /usr/local/lib64   && cp -r mysql-connector*/lib64/*   /usr/local/lib64/ && \
     rm -rf mysql-connector*
 
-# ---- glog ----
-RUN git clone --branch v0.7.1 https://github.com/google/glog.git /home/glog && cd /home/glog && \
-    cmake -S . -B build -DBUILD_TESTING=OFF -DWITH_GTEST=OFF -G "Unix Makefiles" -DCMAKE_RULE_MESSAGES=OFF -DCMAKE_INSTALL_MESSAGE=NEVER >/dev/null && \
+# ---- spdlog ----
+RUN git clone --branch v1.15.3 https://github.com/gabime/spdlog.git /home/spdlog && cd /home/spdlog && \
+    cmake -S . -B build -DSPDLOG_BUILD_SHARED=ON -DSPDLOG_BUILD_EXAMPLE=OFF -DCMAKE_RULE_MESSAGES=OFF -DCMAKE_INSTALL_MESSAGE=NEVER >/dev/null && \
     cmake --build build -j$(nproc) -- -s > /dev/null && cmake --install build > /dev/null && \
-    rm -rf /home/glog
+    rm -rf /home/spdlog
 
 # ---- hiredis ----
 RUN git clone --branch v1.3.0 https://github.com/redis/hiredis.git /home/hiredis && cd /home/hiredis && \
