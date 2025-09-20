@@ -26,17 +26,12 @@ RUN git clone --branch v31.1 https://github.com/protocolbuffers/protobuf.git /ho
     cmake --build build -j$(nproc) -- -s > /dev/null && cmake --install build > /dev/null && \
     rm -rf /home/protobuf
 
-# ---- MySQL Connector/C++ ----
-RUN case "$TARGETPLATFORM" in \
-      "linux/amd64") MYSQL_URL="https://cdn.mysql.com/archives/mysql-connector-c++/mysql-connector-c++-9.3.0-linux-glibc2.28-x86-64bit.tar.gz" ;; \
-      "linux/arm64") MYSQL_URL="https://cdn.mysql.com/archives/mysql-connector-c++/mysql-connector-c++-9.3.0-linux-glibc2.28-aarch64.tar.gz" ;; \
-      *) echo "Unsupported platform: $TARGETPLATFORM" && exit 1 ;; \
-    esac && \
-    wget -q "$MYSQL_URL" && \
-    tar -xzf mysql-connector*.tar.gz  && rm mysql-connector*.tar.gz && \
-    mkdir -p /usr/local/include && cp -r mysql-connector*/include/* /usr/local/include/ && \
-    mkdir -p /usr/local/lib64   && cp -r mysql-connector*/lib64/*   /usr/local/lib64/ && \
-    rm -rf mysql-connector*
+# ---- PostgreSQL Client ----
+# -- gcc自带libpq.so, 因此这里省略了libpq.so的编译 --
+RUN git clone --branch 7.10.1 https://github.com/jtv/libpqxx.git /home/libpqxx && cd /home/libpqxx && \
+    ./configure --enable-shared --disable-static --disable-documentation >/dev/null && \
+    make -s > /dev/null  && make install >/dev/null && \
+    rm -rf /home/libpqxx
 
 # ---- spdlog ----
 RUN git clone --branch v1.15.3 https://github.com/gabime/spdlog.git /home/spdlog && cd /home/spdlog && \
