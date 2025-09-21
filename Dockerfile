@@ -57,6 +57,12 @@ RUN git clone --branch asio-1-34-2 https://github.com/chriskohlhoff/asio.git /ho
     make -s > /dev/null  && make install >/dev/null && \
     rm -rf /home/asio
 
+# ---- tomlplusplus ----
+RUN git clone --branch v3.4.0 https://github.com/marzer/tomlplusplus.git /home/tomlplusplus && cd /home/tomlplusplus && \
+    cmake -S . -B build -DCMAKE_RULE_MESSAGES=OFF -DCMAKE_INSTALL_MESSAGE=NEVER >/dev/null && \
+    cmake --build build -j$(nproc) -- -s > /dev/null && cmake --install build > /dev/null && \
+    rm -rf /home/tomlplusplus
+
 # ---- clangd ----
 RUN wget -q https://github.com/clangd/clangd/releases/download/19.1.2/clangd-linux-19.1.2.zip && \
     unzip -q clangd*.zip  && rm clangd*.zip  && \
