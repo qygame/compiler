@@ -70,4 +70,8 @@ RUN wget -q https://github.com/clangd/clangd/releases/download/19.1.2/clangd-lin
     cp -r clangd*/lib/* /usr/local/lib/ && \
     rm -rf clangd*
 
+# ---- gdb ----
+RUN apt update > /dev/null && apt install gdb -y > /dev/null
+
+
 RUN ldconfig
