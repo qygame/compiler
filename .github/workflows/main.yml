@@ -46,7 +46,7 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/qy-compiler:${{ github.ref_name }}-${{ matrix.suffix }}
           secrets: |
-            ##Dockerfile中调用其他github仓库, 只能使用GIT_AUTH_TOKEN
+            ##Dockerfile中调用其他github仓库, 只能使用GIT_AUTH_TOKEN. 已不再dockerfile中调用其他仓库, 暂时保留.
             GIT_AUTH_TOKEN=${{ secrets.QYGAME_ACTION }}
 
   merge:

@@ -1,15 +1,15 @@
 *目标*
 
 libqykernel compiler
-包含gcc编译器 && 编译所需要的库
+包含编译器 && libqykernel依赖的第三方库
 
 以docker image的形式交付, 托管在ghcr.io/qygame/qy-compiler
 
 
 *构造流程*
 1. trigger when push tag
-2. main.yml call docker (Dockerfile安装配置第三方库)
-4. main.yml push docker-image to ghcr.io/qygame/qy-compiler
+2. main.yml call docker (Dockerfile install third libs)
+4. main.yml push docker-image to ghcr.io
 
 
 *已接入第三方*
