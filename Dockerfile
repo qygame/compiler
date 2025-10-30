@@ -63,15 +63,10 @@ RUN git clone --branch v3.4.0 https://github.com/marzer/tomlplusplus.git /home/t
     cmake --build build -j$(nproc) -- -s > /dev/null && cmake --install build > /dev/null && \
     rm -rf /home/tomlplusplus
 
-# ---- clangd ----
-RUN wget -q https://github.com/clangd/clangd/releases/download/19.1.2/clangd-linux-19.1.2.zip && \
-    unzip -q clangd*.zip  && rm clangd*.zip  && \
-    cp -r clangd*/bin/* /usr/local/bin/ && \
-    cp -r clangd*/lib/* /usr/local/lib/ && \
-    rm -rf clangd*
-
 # ---- gdb ----
 RUN apt update > /dev/null && apt install gdb -y > /dev/null
 
+# ---- clangd ----
+RUN apt install clangd -y > /dev/null
 
 RUN ldconfig
