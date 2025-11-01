@@ -8,6 +8,10 @@
 # clang++: error: unable to execute command: posix_spawn failed: No such file or directory
 # 如果解决了所有项目的报错, 可以考虑使用llvm的lld, llvm-ar等工具代替binutils
 
+# TODO wcq 2025/11/01
+# 使用libc++ 代替libstdc++的时候, 编译会提示错误
+# TODO 补充详细错误信息
+
 FROM debian:12 AS llvm
 
 # Dockerfile(BuildKit)内置参数
@@ -146,3 +150,6 @@ FROM builder-basic
 COPY --from=compiler /usr/local/bin /usr/local/bin
 COPY --from=compiler /usr/local/lib /usr/local/lib
 COPY --from=compiler /usr/local/include /usr/local/include
+
+#  安装compiler中安装过的第三方库
+RUN apt-get install -y --no-install-recommends --fix-missing libpq-dev=15.14-0+deb12u1 > /dev/null
