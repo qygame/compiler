@@ -1,26 +1,21 @@
 # ---------- 第一阶段：裁剪llvm ----------
-# llvm只使用clang编译器 和 一些辅助工具(clangd, clang-format)
-# ld, ar, as 使用binutils中gcc的
-#
-# TODO wcq 2025/10/31
-# 未安装binutils的时候,
-# 使用lld代替ld; llvm-ar, llvm-ranlib代替ar后, 导致有些项目报错
-# clang++: error: unable to execute command: posix_spawn failed: No such file or directory
-# 如果解决了所有项目的报错, 可以考虑使用llvm的lld, llvm-ar等工具代替binutils
-
-# TODO wcq 2025/11/01
-# 使用libc++ 代替libstdc++的时候, 编译会提示错误
-# TODO 补充详细错误信息
+# 裁剪llvm:
+# 1. clang, clang++ (instead of gcc, g++)
+# 2. lld, llvm-ar (instead of ld, ar)
+# 3. libc++ (instead of libstdc++)
+# 4. libc++abi, compiler-rt (instead of libgcc_s, libgcc)
+# 5. extra tools: clangd, clang-format
 
 FROM debian:12 AS llvm
 
 # Dockerfile(BuildKit)内置参数
 ARG TARGETPLATFORM
 
+# install package: wget, tar(xz)
 RUN apt-get update > /dev/null && \
     apt-get install -y --no-install-recommends wget ca-certificates xz-utils > /dev/null
 
-# LLVM
+# install LLVM
 ARG LLVM_VERSION=21.1.4
 
 RUN case "$TARGETPLATFORM" in \
@@ -31,32 +26,56 @@ RUN case "$TARGETPLATFORM" in \
     wget -q "$LLVM_URL" -O llvm.tar.xz
 RUN mkdir -p /llvm && tar -xvf llvm.tar.xz -C /llvm --strip-components=1 >/dev/null
 
-# 定义中转目录
-ENV LLVM_STAGE_DIR=/stage
-RUN mkdir -p $LLVM_STAGE_DIR/bin $LLVM_STAGE_DIR/lib
+# stage dir
+ARG LLVM_STAGE_DIR=/stage
+RUN mkdir -p $LLVM_STAGE_DIR/bin $LLVM_STAGE_DIR/lib $LLVM_STAGE_DIR/include
 
+# ---- 裁剪llvm ----
 # clang
-RUN cp -P /llvm/bin/clang /llvm/bin/clang++ /llvm/bin/clang-21 $LLVM_STAGE_DIR/bin
+ARG CLANG=clang-21
+RUN cp /llvm/bin/$CLANG $LLVM_STAGE_DIR/bin
+RUN find /llvm -type l -exec sh -c '[ "$(readlink -f "$1")" = "/llvm/bin/$CLANG" ]  && echo "$1"' _ {} \; |xargs -I {} cp -P {} $LLVM_STAGE_DIR/bin
+
+# lld, llvm-ar
+RUN cp /llvm/bin/lld /llvm/bin/llvm-ar $LLVM_STAGE_DIR/bin
+RUN find /llvm -type l -exec sh -c '[ "$(readlink -f "$1")" = "/llvm/bin/lld" ]     && echo "$1"' _ {} \; |xargs -I {} cp -P {} $LLVM_STAGE_DIR/bin
+
+RUN find /llvm -type l -exec sh -c '[ "$(readlink -f "$1")" = "/llvm/bin/llvm-ar" ] && echo "$1"' _ {} \; |xargs -I {} cp -P {} $LLVM_STAGE_DIR/bin
+
+# libc++, libc++abi
+RUN find /llvm -name "libc++.a"      |xargs -I {} cp {} $LLVM_STAGE_DIR/lib
+RUN find /llvm -name "libc++abi.a"   |xargs -I {} cp {} $LLVM_STAGE_DIR/lib
+RUN cp -R /llvm/include/c++ $LLVM_STAGE_DIR/include
+RUN find /llvm -name "__config_site" |xargs -I {} cp {} $LLVM_STAGE_DIR/include
+
+# compiler-rt && clang lib depence
 RUN cp -R /llvm/lib/clang $LLVM_STAGE_DIR/lib
+
 # clang tools
 RUN cp /llvm/bin/clangd /llvm/bin/clang-format $LLVM_STAGE_DIR/bin
 
+
 # ---------- 第二阶段：构建最小C++编译环境 ----------
-# C++ 最小env: 编译器, c库, c++库, ld, ar
 FROM debian:12 AS builder-basic
 
 # clang
 COPY --from=llvm /stage/bin /usr/bin
 COPY --from=llvm /stage/lib /usr/lib
+COPY --from=llvm /stage/include /usr/include
 
 RUN apt-get update > /dev/null && \
-    # install c++ env: libc, libstdc++, binutils(ld, ar, as)
-    apt-get install -y --no-install-recommends libc6-dev libstdc++-12-dev binutils > /dev/null && \
+    # fix lld
+    apt-get install -y --no-install-recommends libxml2 > /dev/null && \
+    # install libc
+    apt-get install -y --no-install-recommends libc6-dev > /dev/null && \
     # extra tools
     apt-get install -y --no-install-recommends gdb git >/dev/null && \
     # 减少git提示信息
-    git config --global advice.detachedHead false && \
-    ldconfig
+    git config --global advice.detachedHead false
+
+# set ENV
+ENV CXXFLAGS="-stdlib=libc++"
+ENV LDFLAGS="-fuse-ld=lld -lc++abi -rtlib=compiler-rt"
 
 
 # ---------- 第三阶段：构建编译环境 ----------
@@ -98,7 +117,7 @@ RUN chmod +x ninja && mv ninja /usr/local/bin
 # ---------- 第四阶段：编译第三方库 ----------
 
 # CMAKE Command
-ENV BUILD="cmake -S . -B build -G Ninja -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_CXX_STANDARD=20 -DCMAKE_RULE_MESSAGES=OFF -DCMAKE_INSTALL_MESSAGE=NEVER"
+ARG BUILD="cmake -S . -B build -G Ninja -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_CXX_STANDARD=20 -DCMAKE_INSTALL_MESSAGE=NEVER"
 
 # ---- Protobuf ----
 RUN git clone --branch v31.1 --depth 1 https://github.com/protocolbuffers/protobuf.git /protobuf > /dev/null
@@ -151,5 +170,6 @@ COPY --from=compiler /usr/local/bin /usr/local/bin
 COPY --from=compiler /usr/local/lib /usr/local/lib
 COPY --from=compiler /usr/local/include /usr/local/include
 
-#  安装compiler中安装过的第三方库
+# TODO 后续优化掉 libpq-dev的安装方式
+# 安装compiler中安装过的第三方库
 RUN apt-get install -y --no-install-recommends --fix-missing libpq-dev=15.14-0+deb12u1 > /dev/null
